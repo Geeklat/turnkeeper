@@ -1,5 +1,6 @@
 import { useId, useState } from 'react'
 import { valskaraEntries } from './data/valskara'
+import { ManageCharacter } from './ManageCharacter'
 import { activeKindOrder, alphabetical, entryTypeSections, filterEntries, groupSpellsByTier, innateSpells, tierLabel } from './filtering'
 import { contexts, intents, type Context, type Entry, type Intent } from './types'
 import './styles.css'
@@ -68,13 +69,13 @@ function ActiveGroup({ kind, entries }: { kind: Entry['kind']; entries: Entry[] 
   )
 }
 
-export default function App() {
+function UseCharacter({ entries }: { entries: Entry[] }) {
   const [context, setContext] = useState<Context | ''>('')
   const [intent, setIntent] = useState<Intent | ''>('')
   const [showAvailable, setShowAvailable] = useState(true)
   const [showUnprepared, setShowUnprepared] = useState(true)
   const [ritualOnly, setRitualOnly] = useState(false)
-  const matches = filterEntries(valskaraEntries, context, intent)
+  const matches = filterEntries(entries, context, intent)
   const active = matches.filter((entry) => entry.entryType === 'Active Option')
   const matchingSpells = active.filter((entry) => entry.kind === 'Spell' && (!ritualOnly || entry.ritual))
   const availableSpells = showAvailable ? matchingSpells.filter((entry) => entry.spellAvailability === 'Available') : []
@@ -132,4 +133,30 @@ export default function App() {
       </section>
     </main>
   )
+}
+
+export default function App() {
+  const [mode, setMode] = useState<'use' | 'manage'>('use')
+  const [entries, setEntries] = useState<Entry[]>(() => valskaraEntries.map((entry) => ({
+    ...entry,
+    contexts: [...entry.contexts], intents: [...entry.intents],
+    resolutions: entry.resolutions ? [...entry.resolutions] : undefined,
+    targets: entry.targets ? [...entry.targets] : undefined,
+    requirements: entry.requirements ? [...entry.requirements] : undefined,
+    customTags: entry.customTags ? [...entry.customTags] : undefined,
+  })))
+
+  function saveEntry(saved: Entry) {
+    setEntries((current) => current.some((entry) => entry.id === saved.id)
+      ? current.map((entry) => entry.id === saved.id ? saved : entry)
+      : [...current, saved])
+  }
+
+  return <>
+    <nav className="mode-switch" aria-label="Application mode">
+      <button type="button" aria-pressed={mode === 'use'} onClick={() => setMode('use')}>Use Character</button>
+      <button type="button" aria-pressed={mode === 'manage'} onClick={() => setMode('manage')}>Manage Character</button>
+    </nav>
+    {mode === 'use' ? <UseCharacter entries={entries} /> : <ManageCharacter entries={entries} onSave={saveEntry} />}
+  </>
 }
