@@ -1,4 +1,10 @@
 import { useState, type FormEvent } from 'react'
+import { SuggestionReview } from './SuggestionReview'
+import {
+  applyAllSuggestions,
+  suggestEntryMetadata,
+  type EntrySuggestions,
+} from './suggestions'
 import {
   activations, contexts, entryTypes, intents, kinds, ranges, requirementOptions,
   resolutions, saveTypes, sources, targets, usages, type Entry,
@@ -13,6 +19,7 @@ type Draft = Omit<Entry, 'kind' | 'source' | 'entryType' | 'activation'> & {
 
 type RequiredField = 'name' | 'description' | 'kind' | 'source' | 'entryType' | 'activation' | 'tier'
 type Errors = Partial<Record<RequiredField, string>>
+type ReviewState = { entry: Entry; suggestions: EntrySuggestions }
 
 const blankEntry: Draft = {
   id: '', name: '', description: '', kind: '', source: '', entryType: '', activation: '', contexts: [], intents: [],
@@ -38,11 +45,11 @@ export function EntryForm({ entry, onSave, onCancel }: { entry?: Entry; onSave: 
   } : blankEntry)
   const [tagText, setTagText] = useState(entry?.customTags?.join(', ') ?? '')
   const [errors, setErrors] = useState<Errors>({})
+  const [review, setReview] = useState<ReviewState | null>(null)
 
   const update = <K extends keyof Draft>(field: K, value: Draft[K]) => setDraft((current) => ({ ...current, [field]: value }))
 
-  function submit(event: FormEvent) {
-    event.preventDefault()
+  function buildEntry() {
     const nextErrors: Errors = {}
     if (!draft.name.trim()) nextErrors.name = 'Enter a name.'
     if (!draft.description.trim()) nextErrors.description = 'Enter a description.'
@@ -52,7 +59,7 @@ export function EntryForm({ entry, onSave, onCancel }: { entry?: Entry; onSave: 
     if (!draft.activation) nextErrors.activation = 'Choose an activation.'
     if (draft.kind === 'Spell' && draft.tier === undefined) nextErrors.tier = 'Choose a spell tier.'
     setErrors(nextErrors)
-    if (Object.keys(nextErrors).length) return
+    if (Object.keys(nextErrors).length) return null
 
     const seenTags = new Set<string>()
     const customTags = tagText.split(',').map((tag) => tag.trim()).filter((tag) => {
@@ -61,7 +68,7 @@ export function EntryForm({ entry, onSave, onCancel }: { entry?: Entry; onSave: 
       return true
     })
     const isSpell = draft.kind === 'Spell'
-    onSave({
+    return {
       ...draft,
       id: draft.id || crypto.randomUUID(),
       name: draft.name.trim(), description: draft.description.trim(),
@@ -82,11 +89,49 @@ export function EntryForm({ entry, onSave, onCancel }: { entry?: Entry; onSave: 
       usage: draft.usage || undefined, usageDetail: draft.usageDetail?.trim() || undefined,
       duration: draft.duration?.trim() || undefined, notes: draft.notes?.trim() || undefined,
       customTags: customTags.length ? customTags : undefined,
+    } as Entry
+  }
+
+  function getSuggestions(nextEntry: Entry) {
+    return suggestEntryMetadata({
+      name: nextEntry.name,
+      description: nextEntry.description,
+      activation: nextEntry.activation,
     })
   }
 
+  function reviewSuggestions(event: FormEvent) {
+    event.preventDefault()
+    const nextEntry = buildEntry()
+    if (!nextEntry) return
+    setReview({ entry: nextEntry, suggestions: getSuggestions(nextEntry) })
+  }
+
+  function saveWithSuggestions() {
+    const nextEntry = buildEntry()
+    if (!nextEntry) return
+    onSave(applyAllSuggestions(nextEntry, getSuggestions(nextEntry)))
+  }
+
+  function saveWithoutSuggestions() {
+    const nextEntry = buildEntry()
+    if (nextEntry) onSave(nextEntry)
+  }
+
+  if (review) {
+    return (
+      <SuggestionReview
+        entry={review.entry}
+        suggestions={review.suggestions}
+        onSave={onSave}
+        onBack={() => setReview(null)}
+        onCancel={onCancel}
+      />
+    )
+  }
+
   return (
-    <form className="entry-form" onSubmit={submit} noValidate>
+    <form className="entry-form" onSubmit={reviewSuggestions} noValidate>
       <div className="editor-heading"><div><p className="eyebrow">{entry ? 'Edit entry' : 'New entry'}</p><h2>{entry?.name ?? 'Add an entry'}</h2></div><button type="button" className="text-button" onClick={onCancel}>Cancel</button></div>
       <p className="form-help">Required fields are marked with <span aria-hidden="true">*</span><span className="sr-only">an asterisk</span>.</p>
 
@@ -130,7 +175,12 @@ export function EntryForm({ entry, onSave, onCancel }: { entry?: Entry; onSave: 
       </div></details>
 
       <details className="form-section"><summary>Notes</summary><label>Notes<textarea rows={4} value={draft.notes ?? ''} onChange={(event) => update('notes', event.target.value)} /></label></details>
-      <div className="form-actions"><button type="button" className="secondary-button" onClick={onCancel}>Cancel</button><button type="submit" className="primary-button">Save entry</button></div>
+      <div className="form-actions suggestion-actions">
+        <button type="button" className="secondary-button" onClick={onCancel}>Cancel</button>
+        <button type="button" className="secondary-button" onClick={saveWithoutSuggestions}>Save without tags</button>
+        <button type="button" className="secondary-button" onClick={saveWithSuggestions}>Save with suggested tags</button>
+        <button type="submit" className="primary-button">Review suggested tags</button>
+      </div>
     </form>
   )
 }

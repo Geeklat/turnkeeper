@@ -93,6 +93,14 @@ dd { margin: 0; }
 .checkbox-group label { color: #b7c2bb; font-size: .84rem; }
 .label-note { color: #829087; font-size: .72rem; font-weight: 500; }
 .form-actions { display: flex; justify-content: end; gap: .75rem; margin-top: 1.25rem; }
+.suggestion-actions { flex-wrap: wrap; }
+.suggestion-review .form-section > label { display: grid; gap: .35rem; color: #cad3cd; font-size: .85rem; font-weight: 650; }
+.review-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+.review-grid > label, .review-checks label { color: #c7d0ca; font-size: .9rem; }
+.review-checks { display: grid; align-content: start; gap: .4rem; }
+.review-checks legend { margin-bottom: .15rem; color: #d3a96e; }
+.review-empty { margin: 0; color: #9eaba3; }
+.review-existing { display: contents; }
 @media (max-width: 700px) { main { padding-top: 1.5rem; } .filters { grid-template-columns: 1fr; } .choice-grid { grid-template-columns: repeat(2, 1fr); } .spell-filters { flex-wrap: wrap; } .spell-filters legend { width: 100%; } .entry-toggle { align-items: start; } .entry-summary { grid-template-columns: 1fr 1fr; gap: .35rem 1rem; } .entry-name { grid-column: 1 / -1; margin-bottom: .2rem; } .entry-fact { font-size: .82rem; } .entry-fact:empty { display: none; } .entry-fact:not(:empty)::before { content: attr(data-label) ': '; color: #7f8e85; font-size: .7rem; text-transform: uppercase; } dl { grid-template-columns: 1fr; gap: .1rem; } dd { margin-bottom: .5rem; } }
-@media (max-width: 700px) { .manage-heading, .editor-heading { align-items: stretch; flex-direction: column; } .manage-heading .primary-button { align-self: start; } .form-grid { grid-template-columns: 1fr; } .form-grid .wide { grid-column: auto; } .checkbox-group > div { grid-template-columns: 1fr; } .manage-group li { align-items: start; } }
+@media (max-width: 700px) { .manage-heading, .editor-heading { align-items: stretch; flex-direction: column; } .manage-heading .primary-button { align-self: start; } .form-grid, .review-grid { grid-template-columns: 1fr; } .form-grid .wide { grid-column: auto; } .checkbox-group > div { grid-template-columns: 1fr; } .manage-group li { align-items: start; } .form-actions { align-items: stretch; flex-direction: column; } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; } }
