@@ -37,10 +37,12 @@ The important distinction is that an option does not have to be immediately lega
 
 ## Current prototype
 
-The first vertical slice uses **Valskara**, one of my D&D characters, as a stress-test character.
+The public prototype starts with **Mira Embertrail**, an original example adventurer with a small kit of invented abilities.
 
 At the moment the app supports:
 
+- Manual entry creation and editing
+- Deterministic metadata suggestions with an explicit review step
 - Context + optional Intent filtering
 - Spells and other character option types
 - Spell tiers and spell availability
@@ -52,7 +54,17 @@ At the moment the app supports:
 - Responsive layouts for desktop and narrow screens
 - Keyboard-accessible expand/collapse controls
 
-The Valskara fixture is intentionally doing more work than a tiny demo character would. I want enough real abilities in the app to expose whether the filtering model actually helps once the character has a large number of options.
+Changes last until the page is refreshed; there is no persistence yet.
+
+## Character data
+
+I want Turnkeeper to work with character data supplied by the player, rather than ship a comprehensive library of game rules or abilities. The public example is original demonstration content, not a real game-system character sheet.
+
+The app still starts with that example because upload and import are not implemented. Its document lives in `src/data/example-character.ts`: `formatVersion: 1`, a `character` name, and `entries` using the existing `Entry` model. `loadCharacterEntries` copies those entries into session state. This is a boundary for trusted, already-processed data, not validation for arbitrary uploaded files. No system identifier is needed to load the current UI.
+
+I also use real-character fixtures locally to stress-test the model. Those stay in the ignored `private-fixtures/` directory and are not distributed or needed to build, test, or run the app. Keep a separate local backup of private fixtures: aggressive Git-clean commands can remove ignored files.
+
+Future import work will translate supported character/source formats into this same Turnkeeper document before loading it. That processing, upload validation, and the upload UI are still future work.
 
 ## What this is not
 
@@ -108,23 +120,17 @@ npm run lint
 
 ## Where I am going next
 
-The current filtering prototype is mainly about validating whether the core idea works with a real character.
+The current prototype is mainly about validating filtering and authoring with useful character data.
 
 The next areas I expect to work through are:
 
-1. **Manual entry creation and editing**  
-   Prove that the data model is reasonable to author, not just reasonable to render.
-
-2. **Tag suggestions**  
-   Add a deterministic suggestion pass that can extract obvious facts from an ability description and suggest likely Context / Intent metadata for review.
-
-3. **Persistence**  
+1. **Persistence**
    Decide how character data should be stored only after the create/edit workflow is clear.
 
-4. **Import / bulk entry**  
+2. **Import / bulk entry**
    Manually entering a large character is not a great long-term experience. Importing from pasted text, structured files, or existing character tools is an important future direction.
 
-5. **Other game systems**  
+3. **Other game systems**
    The data model is intended to remain system-agnostic, but I do not want to build a plugin architecture for hypothetical games before a second real system actually needs one.
 
 There are also some longer-term ideas I am interested in, such as party-aware suggestions and noticing useful interactions between characters, but those are intentionally outside the current scope.

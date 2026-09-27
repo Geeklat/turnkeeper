@@ -5,7 +5,7 @@ import type { Entry } from './types'
 
 type EditorState = { mode: 'create' } | { mode: 'edit'; entry: Entry } | null
 
-export function ManageCharacter({ entries, onSave }: { entries: Entry[]; onSave: (entry: Entry) => void }) {
+export function ManageCharacter({ entries, characterName, onSave }: { entries: Entry[]; characterName: string; onSave: (entry: Entry) => void }) {
   const [editor, setEditor] = useState<EditorState>(null)
 
   if (editor) {
@@ -15,7 +15,7 @@ export function ManageCharacter({ entries, onSave }: { entries: Entry[]; onSave:
   return (
     <main className="manage" aria-labelledby="manage-heading">
       <div className="manage-heading">
-        <div><p className="eyebrow">Valskara</p><h1 id="manage-heading">Manage Character</h1><p>Changes last until this page is refreshed.</p></div>
+        <div><p className="eyebrow">{characterName}</p><h1 id="manage-heading">Manage Character</h1><p>Changes last until this page is refreshed.</p></div>
         <button type="button" className="primary-button" onClick={() => setEditor({ mode: 'create' })}>Add Entry</button>
       </div>
       <div className="manage-groups">

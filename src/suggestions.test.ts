@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest'
-import { valskaraSpellFacts } from './data/valskaraSpellFacts'
 import {
   applyAllSuggestions,
   applySuggestionSelection,
@@ -285,15 +284,9 @@ describe('user-authority merge behavior', () => {
   })
 })
 
-describe('Valskara description regressions', () => {
-  const valskaraSuggestion = (name: string) => {
-    const fact = valskaraSpellFacts.find((candidate) => candidate.name === name)
-    if (!fact) throw new Error(`Missing Valskara fact: ${name}`)
-    return suggest(fact.description, { activation: fact.activation })
-  }
-
-  it('retains Sacred Flame factual and classification output', () => {
-    const result = valskaraSuggestion('Sacred Flame')
+describe('original adventure description regressions', () => {
+  it('extracts a visible target, explicit save, and damage intent', () => {
+    const result = suggest('A creature you can see makes a Dexterity save as paper shards swirl past; it takes cutting damage if struck.')
     expect(result.detected).toMatchObject({
       resolutions: ['Save'],
       saveType: 'DEX',
@@ -307,17 +300,17 @@ describe('Valskara description regressions', () => {
   })
 
   it.each([
-    ['Hold Person', 'Control / Disrupt'],
-    ['Healing Word', 'Heal / Recover'],
-    ['Detect Magic', 'Investigate / Learn'],
-    ['Command', 'Influence / Communicate'],
-    ['Sending', 'Influence / Communicate'],
-  ])('retains the representative %s Intent', (name, intent) => {
-    expect(valskaraSuggestion(name).suggested.intents).toContain(intent)
+    ['Paper loops leave the courier restrained.', 'Control / Disrupt'],
+    ['The traveler regains hit points as warm moths settle on their coat.', 'Heal / Recover'],
+    ['You detect fresh footprints with humming pebbles.', 'Investigate / Learn'],
+    ['A brass bird repeats your command to the waiting crew.', 'Influence / Communicate'],
+    ['A folded paper boat carries a message across the pond.', 'Influence / Communicate'],
+  ])('retains the representative %s Intent', (description, intent) => {
+    expect(suggest(description).suggested.intents).toContain(intent)
   })
 
-  it('retains Produce Flame attack and range output', () => {
-    expect(valskaraSuggestion('Produce Flame')).toMatchObject({
+  it('extracts a ranged thread attack', () => {
+    expect(suggest('Flick a copper thread at a creature within 60 feet using a ranged spell attack.')).toMatchObject({
       detected: {
         range: '60 ft',
         resolutions: ['Attack Roll'],
@@ -331,8 +324,8 @@ describe('Valskara description regressions', () => {
     })
   })
 
-  it('continues to fail safely on the compact Silence description', () => {
-    expect(valskaraSuggestion('Silence')).toEqual({
+  it('leaves a compact atmospheric description unclassified', () => {
+    expect(suggest('A velvet hush settles between the hanging lanterns.')).toEqual({
       detected: {
         range: undefined,
         resolutions: [],

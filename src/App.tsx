@@ -1,5 +1,6 @@
 import { useId, useState } from 'react'
-import { valskaraEntries } from './data/valskara'
+import { exampleCharacter } from './data/example-character'
+import { loadCharacterEntries } from './characterDocument'
 import { ManageCharacter } from './ManageCharacter'
 import { activeKindOrder, alphabetical, entryTypeSections, filterEntries, groupSpellsByTier, innateSpells, tierLabel } from './filtering'
 import { contexts, intents, type Context, type Entry, type Intent } from './types'
@@ -69,7 +70,7 @@ function ActiveGroup({ kind, entries }: { kind: Entry['kind']; entries: Entry[] 
   )
 }
 
-function UseCharacter({ entries }: { entries: Entry[] }) {
+function UseCharacter({ entries, characterName }: { entries: Entry[]; characterName: string }) {
   const [context, setContext] = useState<Context | ''>('')
   const [intent, setIntent] = useState<Intent | ''>('')
   const [showAvailable, setShowAvailable] = useState(true)
@@ -86,7 +87,7 @@ function UseCharacter({ entries }: { entries: Entry[] }) {
     <main>
       <header className="hero">
         <p className="eyebrow">Turnkeeper</p>
-        <h1>What is Valskara trying to do?</h1>
+        <h1>What is {characterName} trying to do?</h1>
         <p>Choose the situation first. Add an intent only when it helps narrow the options.</p>
       </header>
 
@@ -116,7 +117,7 @@ function UseCharacter({ entries }: { entries: Entry[] }) {
 
       <section className="results" aria-labelledby="results-heading" aria-live="polite">
         <div className="results-heading">
-          <div><p className="eyebrow">Valskara’s options</p><h2 id="results-heading">{heading}</h2></div>
+          <div><p className="eyebrow">{characterName}’s options</p><h2 id="results-heading">{heading}</h2></div>
           {context && <p className="count">{matches.length} {matches.length === 1 ? 'entry' : 'entries'}</p>}
         </div>
         {!context && <p className="empty">Select one of the four contexts above to surface relevant options.</p>}
@@ -137,14 +138,8 @@ function UseCharacter({ entries }: { entries: Entry[] }) {
 
 export default function App() {
   const [mode, setMode] = useState<'use' | 'manage'>('use')
-  const [entries, setEntries] = useState<Entry[]>(() => valskaraEntries.map((entry) => ({
-    ...entry,
-    contexts: [...entry.contexts], intents: [...entry.intents],
-    resolutions: entry.resolutions ? [...entry.resolutions] : undefined,
-    targets: entry.targets ? [...entry.targets] : undefined,
-    requirements: entry.requirements ? [...entry.requirements] : undefined,
-    customTags: entry.customTags ? [...entry.customTags] : undefined,
-  })))
+  const characterName = exampleCharacter.character.name
+  const [entries, setEntries] = useState<Entry[]>(() => loadCharacterEntries(exampleCharacter))
 
   function saveEntry(saved: Entry) {
     setEntries((current) => current.some((entry) => entry.id === saved.id)
@@ -157,6 +152,6 @@ export default function App() {
       <button type="button" aria-pressed={mode === 'use'} onClick={() => setMode('use')}>Use Character</button>
       <button type="button" aria-pressed={mode === 'manage'} onClick={() => setMode('manage')}>Manage Character</button>
     </nav>
-    {mode === 'use' ? <UseCharacter entries={entries} /> : <ManageCharacter entries={entries} onSave={saveEntry} />}
+    {mode === 'use' ? <UseCharacter entries={entries} characterName={characterName} /> : <ManageCharacter entries={entries} characterName={characterName} onSave={saveEntry} />}
   </>
 }

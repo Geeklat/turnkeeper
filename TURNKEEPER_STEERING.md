@@ -185,10 +185,10 @@ Examples:
 Something whose primary purpose is to change how another Turnkeeper entry is used or resolved rather than accomplishing an Intent independently.
 
 Examples:
-- Embodiment of the Law
-- Sorcerer Metamagic options
+- Quiet Weave, which changes the presentation of another ability
+- an option that changes another entry’s activation
 
-An Entry Modifier is distinct from an Active Option such as Guidance or Bless. An ability is not an Entry Modifier merely because it improves a roll or another character.
+An Entry Modifier is distinct from an Active Option such as Steady Chorus. An ability is not an Entry Modifier merely because it improves a roll or another character.
 
 ---
 
@@ -750,22 +750,18 @@ Within `Spells`:
 Example:
 
 ```text
-COMBAT
-Heal / Recover
+EXPLORATION
+All intents
 
 ────────────────────────────────
 
 SPELLS
 
-Cantrips
-  Spare the Dying — Action — Touch — Automatic >
-
 1st Level
-  Cure Wounds — Action — Touch — Automatic >
-  Healing Word — Bonus Action — 60 ft — Automatic >
+  Pocket Horizon — Bonus Action — Self — Automatic >
 
 2nd Level
-  ...
+  Camp Stitch — Extended — Touch — Automatic >
 ```
 
 ## Collapsed result row
@@ -776,14 +772,13 @@ The initial collapsed row should present:
 
 When Resolution is a Save, show the Save Type:
 
-- Command — Action — 60 ft — WIS Save >
-- Sacred Flame — Action — 60 ft — DEX Save >
+- Ribbon Snare — Action — 60 ft — DEX Save >
 
 Other examples:
 
-- Guiding Bolt — Action — 120 ft — Attack Roll >
-- Bless — Action — 30 ft — Automatic >
-- Cure Wounds — Action — Touch — Automatic >
+- Cinder Thread — Action — 60 ft — Attack Roll >
+- Steady Chorus — Bonus Action — 30 ft — Automatic >
+- Camp Stitch — Extended — Touch — Automatic >
 
 If a value does not apply, omit it cleanly rather than displaying empty punctuation or placeholder noise.
 
@@ -845,25 +840,19 @@ Accessibility behavior that materially changes navigation, activation, focus mov
 
 ---
 
-# 22. Initial Test Case
+# 22. Character Data and Test Fixtures
 
-Valskara is the first taxonomy and UX stress-test character.
+Turnkeeper is intended to process player-supplied character/source data, not distribute a library of published game content.
 
-Valskara uses a blended D&D 5e / 2024 rules context with this precedence:
+The public application starts with an original generic example character. It should exercise the Context/Intent vocabulary, entry kinds and types, spell presentation, and authoring workflows without depending on real-character source material.
 
-> If a D&D 2024 / 5.5e rule exists, use that rule ahead of the older 2014 5e rule.
+Optional real-character stress-test fixtures belong in the ignored `private-fixtures/` directory. They are local development material and must never be required by public builds, tests, or runtime imports. Keep a separate backup because ignored files can be removed by Git-clean operations.
 
-The current Turnkeeper work does not need to model the full mechanical differences between those rulesets yet.
+The current character document is a thin wrapper: `formatVersion: 1`, `character: { name }`, and `entries: Entry[]`. The loading boundary copies trusted, already-processed entries into runtime state. It does not validate arbitrary uploads.
 
-Valskara is used primarily to test:
+Future supported source processors should produce this document and use the same downstream loading path. Upload, validation of external input, system detection, adapters, and persistence remain deferred. Do not create generalized import infrastructure for this boundary.
 
-- whether Context + Intent produces useful narrowing
-- whether Target and Requirement metadata are understandable
-- whether Entry Types reflect real character abilities
-- whether collapsed rows expose useful tactical information
-- whether the deterministic suggestion engine can extract obvious structured details
-
-Do not turn Valskara-specific rules into universal Turnkeeper assumptions.
+Use public examples and private stress tests to check useful filtering, understandable metadata, entry types, compact presentation, and deterministic suggestions. Keep ruleset precedence in private fixture notes when needed; do not universalize character- or system-specific rules.
 
 ---
 
