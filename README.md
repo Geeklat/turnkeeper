@@ -1,100 +1,65 @@
 # Turnkeeper
 
-Turnkeeper is an experimental TTRPG decision-support app for a problem I run into at the table pretty often: having a character sheet full of useful abilities, but still blanking on what is worth considering in the moment.
+Turnkeeper is a TTRPG tool I'm building to help with a problem I run into pretty often at the table: having a character sheet full of useful abilities, but blanking on what I should actually be considering in the moment.
 
-The goal is not to build another complete digital character sheet or a rules engine. I want Turnkeeper to help answer a smaller question:
+A character sheet is great at telling me what my character has. It isn't always great at answering:
 
-> **What options on my character are worth thinking about right now?**
+> **What options are worth thinking about right now?**
 
-The current prototype does that by filtering a character's abilities by **Context** and, optionally, **Intent**, then presenting the remaining options in a compact format that is easier to scan during play.
+Turnkeeper tries to answer that question without becoming another full character sheet or rules engine.
 
-## The idea
+## How it works
 
-A traditional character sheet is good at storing information, but not always great at helping with decisions under time pressure.
+Abilities are tagged with the kinds of situations where they're worth remembering.
 
-Turnkeeper treats character abilities as a set of options that can be surfaced based on what is happening.
-
-Current contexts are:
+The main filter is **Context**:
 
 - Combat
 - Exploration
 - Social / Roleplay
 - Downtime
 
-A player can then narrow those results by intent, such as:
+You can optionally narrow that further with an **Intent**, such as attacking, protecting someone, healing, investigating, influencing someone, or interacting with the environment.
 
-- Attack / Harm
-- Protect / Defend
-- Heal / Recover
-- Support / Empower
-- Control / Disrupt
-- Move / Escape
-- Investigate / Learn
-- Influence / Communicate
-- Interact / Manipulate
+The important part is that Turnkeeper isn't trying to decide whether something is technically legal at this exact second. If an ability is something I might reasonably want to remember in the current situation, I want it to show up.
 
-The important distinction is that an option does not have to be immediately legal or usable to appear. If it is something I would reasonably want to remember in that situation, it belongs in the result set.
+## Current state
 
-## Current prototype
+The prototype currently has two main views.
 
-The public prototype starts with **Mira Embertrail**, an original example adventurer with a small kit of invented abilities.
+**Use Character** is where I filter a character's options by Context and Intent and scan the results during play.
 
-At the moment the app supports:
+**Manage Character** is where I can add and edit abilities and review Turnkeeper's suggested classifications.
 
-- Manual entry creation and editing
-- Deterministic metadata suggestions with an explicit review step
-- Context + optional Intent filtering
-- Spells and other character option types
-- Spell tiers and spell availability
-- Available vs. unprepared spell presentation
-- Ritual filtering
-- Compact, aligned result rows for quick scanning
-- Expandable detail views
-- Range, activation, duration, resolution, saves, concentration, and related spell metadata
-- Responsive layouts for desktop and narrow screens
-- Keyboard-accessible expand/collapse controls
+Suggestions are deterministic rather than AI-generated. Turnkeeper can pick up concrete details from an entry, such as range, saves, targets, or concentration, and can also suggest broader Context and Intent tags. Those suggestions are reviewable rather than silently changing the character data.
 
-Changes last until the page is refreshed; there is no persistence yet.
+The app currently supports spells, features, skills, items, and basic actions, along with details such as activation, range, duration, resolution, saves, spell tiers, availability, rituals, and requirements.
 
-**Use Character** is the filtering and decision-support view. **Manage Character** is where I create and edit entries. **Review suggested tags** is the primary/default save path; **Save with suggested tags** applies suggestions directly, and **Save without tags** saves without running suggestions. Existing classifications are preserved unless edited explicitly.
+Changes are still session-only, so refreshing the page resets the character.
 
 ## Character data
 
-I want Turnkeeper to work with character data supplied by the player, rather than ship a comprehensive library of game rules or abilities. The public example is original demonstration content, not a real game-system character sheet.
+Eventually I want players to bring their own character data into Turnkeeper rather than have the app ship with a library of game rules and abilities.
 
-The app still starts with that example because upload and import are not implemented. Its document lives in `src/data/example-character.ts`: `formatVersion: 1`, a `character` name, and `entries` using the existing `Entry` model. `loadCharacterEntries` copies those entries into session state. This is a boundary for trusted, already-processed data, not validation for arbitrary uploaded files. No system identifier is needed to load the current UI.
+For now the public version starts with **Mira Embertrail**, a small sample character I use to demonstrate and test the UI.
 
-I also use real-character fixtures locally to stress-test the model. Those stay in the ignored `private-fixtures/` directory and are not distributed or needed to build, test, or run the app. Keep a separate local backup of private fixtures: aggressive Git-clean commands can remove ignored files.
+Behind the scenes, Turnkeeper has its own simple character-document format. The idea is that future importers can take data from a supported character source, turn it into that format, and then let the rest of the app treat every character the same way.
 
-Future import work will translate supported character/source formats into this same Turnkeeper document before loading it. That processing, upload validation, and the upload UI are still future work.
+## What Turnkeeper isn't trying to do
 
-## What this is not
+Turnkeeper isn't currently trying to replace a character sheet, enforce every game rule, track encounter state, or calculate the mathematically best move.
 
-At least for now, Turnkeeper is **not** trying to:
-
-- replace a full character sheet
-- enforce whether an ability is legal at this exact moment
-- track spell slots, actions, positioning, enemy defenses, or encounter state
-- recommend the mathematically optimal action
-- become tied permanently to D&D-specific rules
-
-The current focus is decision support, not rules automation.
+The focus is much narrower: help me remember the options I already have when I'm deciding what to do.
 
 ## Tech
 
-The project is deliberately small right now:
+Turnkeeper is currently built with React, TypeScript, Vite, semantic HTML, and plain CSS.
 
-- React
-- TypeScript
-- Vite
-- Semantic HTML
-- Plain CSS
-
-I am avoiding extra infrastructure until the product actually needs it. There is no backend, router, database, authentication layer, global state library, or UI framework at this stage.
+There is no backend, database, authentication, router, global state library, or UI framework yet. I'll add infrastructure when the product gives me a reason to need it.
 
 ## Running locally
 
-I have verified the current project with Node 24.14.0; this is a tested environment, not a minimum supported version.
+I've verified the current project with Node 24.14.0. That's a tested environment, not a minimum supported version.
 
 Install dependencies:
 
@@ -108,9 +73,7 @@ Start the development server:
 npm run dev
 ```
 
-Then open the local URL reported by Vite.
-
-Build the production bundle:
+Build:
 
 ```bash
 npm run build
@@ -122,38 +85,31 @@ Lint:
 npm run lint
 ```
 
-Run the tests and TypeScript checks:
+Run tests and TypeScript checks:
 
 ```bash
 npm test
 npm run typecheck
 ```
 
-## Where I am going next
+## What's next
 
-The current prototype is mainly about validating filtering and authoring with useful character data.
+The biggest missing piece is getting character data into and out of Turnkeeper without manually rebuilding a character every session.
 
-The next areas I expect to work through are:
+I'm working toward a flow where a player can load character data, use and edit it in Turnkeeper, and save those changes for later. After that, I want to explore importing from real character sources rather than requiring Turnkeeper's own format.
 
-1. **Persistence**
-   Decide how character data should be stored only after the create/edit workflow is clear.
+I also want to try the model against other game systems before deciding how much needs to be generalized. I'd rather discover the abstraction from real examples than build a plugin system for hypothetical ones.
 
-2. **Import / bulk entry**
-   Manually entering a large character is not a great long-term experience. Importing from pasted text, structured files, or existing character tools is an important future direction.
+There are some longer-term ideas I'm interested in too, especially party-aware suggestions and interactions between characters, but they're well beyond the current prototype.
 
-3. **Other game systems**
-   The data model is intended to remain system-agnostic, but I do not want to build a plugin architecture for hypothetical games before a second real system actually needs one.
+## Development
 
-There are also some longer-term ideas I am interested in, such as party-aware suggestions and noticing useful interactions between characters, but those are intentionally outside the current scope.
+I'm using coding agents during implementation, investigation, and review, while keeping product, UX, scope, and architecture decisions human-directed.
 
-## Development approach
-
-I am using coding agents as part of the development workflow for implementation, investigation, and review, but I am keeping product, UX, architecture, and scope decisions deliberate.
-
-One of the things I am explicitly trying to practice with this project is **not** turning a straightforward idea into a framework before there is evidence that the extra complexity is useful.
+Part of the point of this project for me is practicing restraint: build the thing I need now, see where it fails, and only add more architecture when there's a concrete reason for it.
 
 ## Status
 
 Early prototype / active development.
 
-The current goal is to prove the filtering experience before investing in persistence, integrations, or broader architecture.
+Right now I'm mainly trying to prove that filtering a character by **what's happening** and **what I'm trying to do** is actually useful at the table.
