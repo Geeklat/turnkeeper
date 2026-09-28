@@ -35,16 +35,16 @@ function EntryRow({ entry }: { entry: Entry }) {
           <dl>
             {entry.activationDetail && <><dt>Activation detail</dt><dd>{entry.activationDetail}</dd></>}
             {entry.rangeDetail && <><dt>Range detail</dt><dd>{entry.rangeDetail}</dd></>}
-            {entry.resolutions?.length && <><dt>Resolution</dt><dd>{resolutionLabel(entry)}</dd></>}
+            {!!entry.resolutions?.length && <><dt>Resolution</dt><dd>{resolutionLabel(entry)}</dd></>}
             {entry.intents.length > 0 && <><dt>Intent</dt><dd>{entry.intents.join(', ')}</dd></>}
-            {entry.targets?.length && <><dt>Target</dt><dd>{entry.targets.join(', ')}</dd></>}
-            {entry.requirements?.length && <><dt>Requirements / limitations</dt><dd>{entry.requirements.join(', ')}{entry.requirementDetails ? `. ${entry.requirementDetails}` : ''}</dd></>}
+            {!!entry.targets?.length && <><dt>Target</dt><dd>{entry.targets.join(', ')}</dd></>}
+            {!!entry.requirements?.length && <><dt>Requirements / limitations</dt><dd>{entry.requirements.join(', ')}{entry.requirementDetails ? `. ${entry.requirementDetails}` : ''}</dd></>}
             {entry.usage && <><dt>Usage / frequency</dt><dd>{entry.usage}{entry.usageDetail ? ` — ${entry.usageDetail}` : ''}</dd></>}
             {entry.duration && <><dt>Duration</dt><dd>{entry.duration}</dd></>}
             {entry.kind === 'Spell' && <><dt>Availability</dt><dd>{entry.spellAvailability}{entry.ritual ? ' · Ritual' : ''}</dd></>}
             <dt>Source</dt><dd>{entry.source}{entry.sourceName ? ` — ${entry.sourceName}` : ''}</dd>
             {entry.notes && <><dt>Notes</dt><dd>{entry.notes}</dd></>}
-            {entry.customTags?.length && <><dt>Tags</dt><dd>{entry.customTags.join(', ')}</dd></>}
+            {!!entry.customTags?.length && <><dt>Tags</dt><dd>{entry.customTags.join(', ')}</dd></>}
           </dl>
         </div>
       )}

@@ -56,6 +56,8 @@ At the moment the app supports:
 
 Changes last until the page is refreshed; there is no persistence yet.
 
+**Use Character** is the filtering and decision-support view. **Manage Character** is where I create and edit entries. **Review suggested tags** is the primary/default save path; **Save with suggested tags** applies suggestions directly, and **Save without tags** saves without running suggestions. Existing classifications are preserved unless edited explicitly.
+
 ## Character data
 
 I want Turnkeeper to work with character data supplied by the player, rather than ship a comprehensive library of game rules or abilities. The public example is original demonstration content, not a real game-system character sheet.
@@ -92,6 +94,8 @@ I am avoiding extra infrastructure until the product actually needs it. There is
 
 ## Running locally
 
+I have verified the current project with Node 24.14.0; this is a tested environment, not a minimum supported version.
+
 Install dependencies:
 
 ```bash
@@ -116,6 +120,13 @@ Lint:
 
 ```bash
 npm run lint
+```
+
+Run the tests and TypeScript checks:
+
+```bash
+npm test
+npm run typecheck
 ```
 
 ## Where I am going next

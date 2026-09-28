@@ -18,27 +18,13 @@ It should not initially attempt to answer:
 
 ---
 
-## Relationship to Global Steering
+## Relationship to Personal Engineering Guidance
 
-This file supplements the repository-wide `GITHUB_CODING_PROJECTS_STEERING` guidance.
+Turnkeeper was developed within broader personal engineering guidance, including a private `GITHUB_CODING_PROJECTS_STEERING` document. That background is not a dependency of this repository; the project-specific product, UX, taxonomy, and architecture decisions are recorded here.
 
-The global steering document remains authoritative for:
+For repository work, inspect the current implementation, decide on a bounded change, implement it, verify it, and review the result. Keep accessibility, testing, documentation, and repository hygiene part of that work. Avoid speculative architecture.
 
-- inspect → decide → implement → verify → review
-- Human Decision Gates
-- avoiding speculative architecture and agent-driven overengineering
-- accessibility
-- testing
-- debugging
-- documentation
-- Git behavior
-- release discipline
-- repository hygiene
-- public-repository review
-
-This Turnkeeper file exists to preserve **project-specific product, UX, taxonomy, and architecture decisions**.
-
-Do not duplicate global steering rules here unless Turnkeeper needs a stricter or more specific constraint.
+Where this document calls for a **Human Decision Gate**, discuss the proposed product, architecture, or interaction change with the maintainer before implementing it. Routine implementation within an already-approved scope does not require another decision. Commits, pushes, history rewrites, and visibility changes require explicit authorization.
 
 ---
 
@@ -976,16 +962,20 @@ The product should remain capable of becoming system-agnostic, but do not build 
 
 # 26. Known Future Questions
 
-These are not approved implementation requirements yet.
+Create/Edit and the initial deterministic suggestion engine are implemented. The primary Review suggested tags path preselects new detected metadata and leaves suggested Context/Intent values unselected. Direct application and saving without running suggestions are also available.
+
+When suggestions are applied, existing single-value metadata is preserved and selected multi-values are added without duplicates. Existing values can be changed explicitly in the editor; re-running suggestions does not silently replace them. The current phrase rules, ambiguity cases, and merge behavior are covered by tests.
+
+The following refinements and future questions are not approved implementation requirements yet.
 
 - What persistence approach should Turnkeeper use?
 - How should multiple characters be managed?
-- How should editing and re-running suggestions reconcile with existing user changes?
-- What exact deterministic phrase/pattern rules belong in the first suggestion engine?
+- Does the current additive reconciliation need an explicit replacement or removal workflow after more editing experience?
+- Which additional phrase/pattern rules are justified by real inputs, and how should ambiguous suggestions be presented?
 - What should the full expanded-entry visual hierarchy be?
 - Should Target, Resolution, Range, Usage/Frequency, or other metadata become secondary filters after usability testing?
 - What import format should be implemented first?
 - When does party awareness become useful enough to justify cross-character data?
 - What second TTRPG system should be used to test whether the current neutral vocabulary actually generalizes?
 
-These should be handled one meaningful decision at a time under the global Human Decision Gate process.
+These should be handled one meaningful decision at a time using the Human Decision Gate described above.
